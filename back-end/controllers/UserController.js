@@ -62,7 +62,7 @@ module.exports = class UserController {
             name,
             email,
             phone,
-            passaword: passwordHash
+            password: passwordHash
         })
 
 
@@ -98,7 +98,7 @@ module.exports = class UserController {
 
         // checando se a senha combina com a senha do banco de dados
 
-        const checkPassword = await bcrypt.compare(password, user.passaword)
+        const checkPassword = await bcrypt.compare(password, user.password)
 
         if (!checkPassword) {
             res.status(422).json({
@@ -125,7 +125,7 @@ module.exports = class UserController {
 
             currentUser = await User.findById(decoded.id)
 
-            currentUser.passaword = undefined
+            currentUser.password = undefined
 
 
         } else {
@@ -134,6 +134,21 @@ module.exports = class UserController {
 
         res.status(200).send(currentUser)
 
+    }
+
+    static async getUserById(req, res) {
+        const id = req.params.id
+
+        const user = await User.findById(id).select("-password")
+
+        if (!user) {
+            res.status(422).json({
+                message: 'Usuário não encontrado !',
+            })
+            return
+        }
+
+        res.status(200).json({ user })
     }
 
 }
